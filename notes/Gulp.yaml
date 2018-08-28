@@ -1,0 +1,98 @@
+# https://github.com/gulpjs/gulp/blob/master/docs/API.md  
+
+CommonKnowledge: |
+    globs: |
+        Used for matching files. Here we would introduce its rule/pattern as follow
+            ? Use '/' as the only valid slash
+            ? Braces("{" and "}") will expand into a set before parsing. The content is a comma-delimited string.
+            ? '*' matches 0 or more characters in a single path portion.
+            ? '?' matches 1 character
+            ? [...] matches a range of characters, similar to a RegExp range. Prepand '!' for negate the result.
+            ? !(a|b|c) matches none of provided patterns
+            ? *(a|b|c) matches zero or more occurrences of provided patterns
+            ? +(a|b|c) matches one or more occurrences of provided patterns
+            ? ?(a|b|c) matches zero or one occurrences of provided patterns
+            ? @(a|b|c) matches exactly one of provided patterns
+            ? ** matches zero or more directories and subdirectories searching for matches. symlinked directories will skipped.
+            ? '.' when it uses as the first character, it will not match unless the path also has a '.' as its first character
+    glob2base: Extracts a base path from a glob instance
+    stream: |
+        Node has its own "stream" concept. Here we talk "glob-stream" more.
+        "glob-stream" is a readable-stream interface over glob.
+    Vinyl_files: |
+        It's a adapter for a "file". It is  simply a metadata object looks like 
+            {
+                path: "xxx",
+                contents: "xxxxx"
+            }
+        Logically speaking, a "file" doesn't has to be located in your computer's file system, 
+        so Vinyl might could be used to describe files from all of external sources.
+        After describing a "file", now we want a unified way to access it. So Vinyl-adapter comes to help.
+        Vinyl-adapter looks like
+            {
+                src(globs): returns a stream produces Vinyl objects,
+                dest(folder): returns a stream consumes Vinyl objects
+            }
+        extra methods could be exposed if necessary
+    pipe: |
+        Check readable.pipe of Node
+    promise: |
+        Check promise of Node
+    gaze: |
+        A globbing fs.watch wrapper built from the best parts of other fine watch libs.
+        Might be the main implementation for gulp.watch.
+        the "opts" of gulp.watch looks like 
+        {
+            interval(integer): interval to pass to fs.watchFile
+            debounceDelay(integer): delay for events called in succession for the same file/event in milliseconds.
+            mode(String): default 'auto', 'watch' to force native events, or 'poll' to force stat polling.
+            cwd(String): Default is process.cwd(). the current working directory to base file patterns from.
+        }
+API: |
+    gulp.src(globs[, options]): |
+        globs can be a String or an array of String.
+        options is an Object, it is used for configuring provided globs, 
+        so it supports all those supported by node-glob and glob-stream except "ignore".
+        extra options are 
+            buffer(Boolean): Default true. Setting this to false will return file.contents as a stream.
+            read(Boolean): Default true. Setting this to false will return file.contents as null and not read the file at all.
+            base(String): Default is everything before a glob starts (see glob2base)
+    gulp.dest(path[, options]): |
+        Can be piped to and it will write files.
+        Re-emits all data passed to it so you can pipe to multiple folders.(Non-exist folders will be created)
+        The write path has two cases 
+            Absolute: appending the file relative path to the given destination directory
+            Relative: calculated against the file base
+        Path could be a String or a function that returns a vinyl File instance.
+        Options looks like 
+        {
+            cwd(String): Default is process.cwd(). only has an effect if provided output folder is relative.
+            mode(String): Default is 0777. Octal permission string specifying mode for any new-created folders.
+        }
+    gulp.task(name[, deps][, fn]): |
+        name is the unique identifier for the task. Spaces is now allowed when defining the name.
+        deps is an Array which contains the tasks to be executed and completed before this task will run.
+        Note that all dependency tasks will run in parallel, so don't assume that they would start/finish in order.
+        fn is a Function which performs the tasks's main operations. Normally it takes no argument.
+        you can define Async task by 
+            ? Accept a callback
+            ? Return a stream 
+            ? Return a promise
+        If you have a task needs its dependent tasks to be performed in a particular order, you can achieve this by making 
+        use of Async tasks like
+            gulp.task('one', function(cb){
+                cb(err); // if err is not null and not undefined, the run will stop. In's a fail for this task
+            });
+            gulp.task('two', ['one'], function(){}); //it will wait task one to complete
+    gulp.watch(globs[, opts], tasks): |
+        globs indicate which files to watch for changes.
+        opts is an Object which will be passed to gaze.
+        tasks is an Array contains the tasks to run when a file changes.
+    gulp.watch(globs[, opts, cb]): |
+        globs indicate which files to watch for changes.
+        opts is an Object which will be passed to gaze.
+        cb indicates the Callback to be called on each change. It takes one argument like 
+        {
+            type(String): added | changed | deleted | renamed,
+            path(String): the file that triggered the event
+        }

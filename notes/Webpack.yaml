@@ -1,0 +1,189 @@
+# https://webpack.js.org/concepts/
+# https://rhadow.github.io/2015/04/02/webpack-workflow
+
+Why_Bundler: |
+    Module bundler for modern JavaScript applications will recursively builds a dependency graph that includes 
+    every module the application needs, then packages all of those modules into a small number of bundles.
+    Here the term "module" is not restricted to JavaScript-block but any type of assets your application needs.
+    After bundled, Webpack will inject some code into the output file for its work. It has two parts briefly
+    1. Runtime: It's basically all the code webpack needs to connect your modularized application while it's running in the browser. 
+       It contains the loading and resolving logic needed to connect your modules as they interact.
+    2. Manifest: As the compiler enters, resolves, and maps out your application, it keeps detailed notes on all your modules. 
+       This collection of data is called the "Manifest" and it's what the runtime will use to resolve and load modules once they've 
+       been bundled and shipped to the browser. 
+    Content here is necessary when improving the performance of your application, it could maximum the usage of browser-caching.
+ 
+How_Does_Webpack_Work: |
+    Basically, the journey starts from the entry point you defined in configuration file.
+    Webpack scans all your required/imported/used asset to build "dependency graph" of application, 
+    now webpack has many modules and it will leave "manifest" of these modules for future resolving usage.
+    After bundle has delivered, a "Runtime" will do the loading, resolving, connecting to your module according to "mainfest".
+    I guess that's why "Deployment Target" is configurable & supported gracefully in webpack
+    since you can just have proper additions for any specific simulated environment.
+MoreAdvancedFeatures: |
+    These features are achievable by using bundler i guess.
+    CommonChunks: |
+        By bundling common-used chunks into a seperate file, then it can take advantage from browser's caching mechanism.
+        You might need this to achieve "Vendor-Spliting" for your single-page-application, 
+        or to share common application-code for your muli-page-application.
+        Check Plugin "CommonChunkPlugin" for more detailed information.
+    HotModuleReplacement(HMR): |
+        HMR exchanges, add, or removed modules while an application is running, without a full reload.
+        This can significantly speed up development in a few ways 
+            ? Retain application state which is lost during a full reload
+            ? Save valuable development time by only updating what's changed
+            ? Tweak styling faster (almost comparable to changing styles in the browser's debugger)
+        To enable this feature, just add "hot: true" into devServer config in webpack-configuration
+Concepts: |
+    webpack executes according to configuration file(webpack.config.js).
+    here we have four properties to configure like below
+        {   // this object will be exported as the result of configuration
+            // however, you can export an Array of configuration-object when you bundle for multiple Targets
+            "entry": '',  // see Entry
+            "output": {   // see Output
+                "path": '',    // where our bundled code to be emitted to
+                "filename": '' // the name of our bundled code
+            }, 
+            "module": {   // see Loaders
+                "rules": [    // defined loaderes here
+                    {    // configuration for a single loader
+                        "test": '', // the pattern webpack will check on when resolving require() or import
+                        "use": ''   // here to specify the loader to handle this kind of file. String or Object
+                    }
+                ]
+            },
+            "plugins": [ // see Plugins
+                // list dependent plugins here, here should be instances of each Plugin
+            ]
+        }
+    Entry: |
+        The starting point of dependency graph is known as an "entry point".
+        it tells webpack where to start and follows the graph of dependencies to know what to bundle.
+        you can think entry point as the "contextual root" or "thr first file to kick off the app"
+        Entry can be 
+            String: indicates it is a single-main-entry
+            Array: it contains a list of file paths, in this case it would be multi-main-entry
+            Object:  | 
+                most scalable way of defining entries, easy to be reused or combined with other partial configurations.
+                it is recommended to use this syntax when you want to separate concerns by environment, build-target, and runtime.
+                It seems recommended to separate application-code and vendor-code in all cases (A.K.A "Vendor-Spliting")
+                since their dependency graphs are completely independent of each other.
+        Entry-defining varies according to the type of your application (single-page or multi-page)
+        You could consider the benefit from adapting "CommonChunks" in both cases.
+        Code-Splitting: |
+            This is one of the most compelling features of webpack, this allows for smaller bundles, and allows you to control resource load prioritization, which if used correctly, can hava a major impact on your application load time.
+            CSS-Splitting: |
+                To split your styles into a separate bundle, independent from application logic.
+                This enhances cacheability of your styles and allows the browser to load the styles in-parallel with your application code, thus preventing a flash of unstyled content(A.K.A FOUC).
+                Try plugin "ExtractTextWebpackPlugin" to achieve this.
+            Vendor-Code-Splitting: |
+                A typical application can depend on many third party libraries for framework/functionality need, and code present in these libraries does not change often.
+                If we keep code from these libraries in its own bundle, separate from the application code , we can leverage the browser's caching mechanism to cache these files for longer durations on the user's machine.
+                Check Output.Caching for more detailed information.
+            Application-Code-Manually-Splitting: |
+                To split your bundle into chunks which can be downloaded asynchronously at a later time, like allows to serve a minimal bootstrap bundle first and then load additional features later.
+                require.ensure: |
+                    Basically it is specific to webpack and superseded by import()
+                Dynamic_Import: |
+                    Using "import()", webpack treats import() as a split-point and puts the requested module in a separate chunk.
+                    here are several points should be noticed
+                    - Must contain at least some information about where the module is located, so bundling can be limited to a specific directory or set of files. You can use variables like "${language}" in the path, all potential files could be recognized by the rest information would be bundled into the split-point, and the variable would be determined at runtime and specific file would be used.
+                    - import() is based on Promise, so don't forget to add polyfill like "es6-promise" or "promise-polyfill" to older browsers.
+                    - you can specify chunk-name by using "magic comment" like "import(/* webpackChunkName: 'my-chunk-name' */ 'module')", and "[index]" and "[request]" are supported variables in newer version of webpack(since 2.6.0)
+                    - you can specify import-mode by using "magic comment" like "/* webpackMode: lazy/lazy-once/eager */". The default mode is "lazy" which generates a chunk per request; "lazy-once" is only available for import with expression, generates a single chunk for all possible requests, so only the first request would cause a network request; "eager" generates no chunk but including all files in the current chunk.
+                    - you might need to add plugin "syntax-dynamic-import" if you use import with Babel.
+                    - you might need more plugins if tend to use ES2017 "async/await" with Babel. Including "syntax-async-functions", "syntax-dynamic-import", "transform-async-to-generator", "transform-regenerator", "transform-runtime"
+    Output: |
+        After all of the assets were bundled, Output tells webpack how to treat bundled code.
+        No matter how many entries you have specified, you can have only ONE output configuration.
+        Here are extra values you can pass to Output 
+            chunkFilename: |
+                id: ?
+                name: ?
+                hash: ?
+                chunkhash: ?
+            crossOriginLoading: possible value is "false", "anonymous", or "use-credentials"
+            devtoolLineToLine: Boolean
+            hotUpdateChunkFilename: ???
+            hotUpdateFunction: ???
+            hotUpdateMainFilename: ???
+            jsonpFunction: ???
+            library: ???
+            libraryTarget: ???
+            sourceMapFilename: ???
+        Auto-Ganerated-HTML: |
+            In old days, no matter how advanced our application architecture can be, we still need a hard-codded HTML to kick off.
+            Now you can use plugins to do this job for you automatically.
+                Single-page: try "HtmlWebpackPlugin"
+                Multi-page: try "MultipageWebpackPlugin"
+            In this job, "Manifest" plays a role in understanding how your modules map to the output bundles.
+            you can try "WebpackManifestPlugin" and "ChunkManifestPlugin" for more detailed information.
+        ProductionVersion: |
+            Make sure to deliver Production-build when released to Production.
+            it actually do the optimization in several aspects.
+            A term "Tree-Shaking" means live-code import, dead-code elimination.
+        Caching: |
+            Each time something needs to be updated in our code, it has to be re-deployed on the server and then re-downloaded by all clients. The way it works has a pitfall that if we don't change filenames of our resources when deploying a new version, the browser might think it hasn't been updated and client will get a cached version of it.
+            In a pre-webpack era we used to add a build number to the filenames as a parameter and then increment it.
+            It is even easier to do with webpack. Each webpack build generates a unique hash which can be used to compose a filename, by including output placeholders like below 
+                {
+                    path: path.join(__dirname, "build"), 
+                    filename: "[name].[hash].js"
+                }
+            But the problem here is, builds after any file update will update all filenames and clients will have to re-download all application code, and it is the situation we absolutely wanna avoid.
+            Step_A_[Use chunkhash to add a content-dependent cache-buster to each file]:
+                Webpack allows you generate hashes depending on file contents by placing the placeholder "hash" with "chunkhash".
+                Don't use "[chunkhash]" in DEV since this will increase compilation time. Using "[name].js" for DEV and "[name].[chunkhash].js" in Prod are recommended.
+                After using hash/chunkhash in filename, each time we build will result in different filenames. In order to reference a correct file in the HTML, we'll need information about our build which can be extracted from webpack compilation stats by using plguins like "webpack-mainfest-plugin" or "assets-webpack-plugin". Alternatively, you can use folllowing code in "plugins"
+                    function(){
+                        this.plugin("done", function(stats){
+                            require("fs").writeFileSync(
+                                path.join(__dirname, "build", "stats.json"), 
+                                JSON.stringify(stats.toJson())
+                            );
+                        });
+                    }
+                During compilation, identifiers are generated and used as module names for minimizing size of generated files. You can try plugin "NamedModulesPlugin" for DEV, "HashedModulesIdsPlugin" for Prod to take charge of generating identifiers, then we can use these identifiers later on.
+                These identifiers are mapped to chunk filenames, and then put into a JavaScrip object called "chunk manifest". The chunk manifest(along with bootstrapping/runtime code) is crucial for webpack-packaged code to work and then placed into the entry chunk. Whenever we change any part of the code it will update our entry chunk to include the new manifest. This in turn, will lead to a new hash and dismiss the long-term caching.
+            Step_B_[Extract the webpack manifest into a separate file]: 
+            To fix that, we should use "ChunkManifestWebpackPlugin" to extract the manifest to a separate JSON file. This replaces the chunk manifest with a variable in the webpack runtime.
+            Here is a better way. We can extract the runtime into a separate entry by using "CommonsChunkPlugin" and config it as 
+                new webpack.optimize.CommonsChunkPlugin({
+                    name: ["vendor", "manifest"], 
+                    minChunks: Infinity
+                }),
+                new ChunkMainifestPlugin({
+                    filename: "chunk-manifest.json", 
+                    manifestVariable: "webpackManifest"
+                })
+                As we removed the manifest from the entry chunk, now it's our responsibility to provide webpack with it. 
+            Step_C_[Ensure that the entry point chunk containing the bootstrapping code doesn't change has over time for the same set of dependencies]: 
+                The "manifestVariable" option in the example above is the name of the global variable where webpack will look for the manifest JSON. This should be defined before we require our bundle in HTML by inlining the contents of the JSON in HTML. Try "webpack-chunk-hash" or "webpack-md5-hash" to use the content for file hashes.
+                Inlining the chunk manifest and webpack runtime coul prevent extra HTTP requrest. It is often enough to generate a single index.html to do this if you don't need server-side-rendering. Try "HtmlWebpackPlugin"(used earlier) in combination with "ScriptExtHtmlWebpackPlugin" or "InlineManifestWebpackPlugin".
+    Loaders: |
+        The goal is to have all of the assets in your project be webpack's concern and not the browsers.
+        (it does not mean that they all have to be bundled together)
+        Every file(.css, .html, scss, .jpg, etc) were treated as a module, however webpack only understands JavasScript.
+        Loaders in webpack transform these files into modules as they are added to your dependency graph.
+        All published loaders should be installed via npm as dev-dependency.
+        By the way, you can specify a chain of loaders to a certain type of file.
+        it seems very familiar to gulp tasks, including Async/Sync loader, piped processing.
+        Asset-management: |
+            Everything used in your site/app were treated as a module through corresponding loader.
+            it can be applied to CSS, PNG, etc. The biggest benefit is to make our work clean & neat.
+            Not you can declare all your dependencies of certain module separately, and webpack will manage the mass.
+        Shimming: has defferent ways to help webpack understand broken modules.
+    Plugins: |
+        Loaders only execute transforms on a per-file basis
+        Plugins are mostly used performing actions and custom functionality on "compilations" or "chunks" of bundled modules.
+Separate_Configuration_for_different_enviornment: |
+    Environment_Variables: |
+        To disambiguate in your webpack.config.js between Dev and Prod, you may use environment variables.
+        You can set variables when running webpack, or using "cross-env" package to cross-platform-set environment variables like
+            "build": "cross-env NODE_ENV=production PLATFORM=web webpack"
+        Then you can access environment variables in config file like 
+            "process.env.NODE_ENV === 'production'"
+ReactComponentLazyLoading: |
+    Components can be load lzaily, it's especially useful when components rely on a heavy library.
+    However, the source code should have to modified to meet some requirement for lazy-loading.
+
