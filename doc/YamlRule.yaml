@@ -1,0 +1,87 @@
+# 2017/01/01
+# this is used as single-line comment
+--- #this used as separator of files (yes, you can attach multiple files inside of a single YAML file). Also can used as the begining the whole file
+# WARNING: YAML is heavily focus on the leading spaces(like Python?), and TAB is not recommended to use.
+#          Leading spaces would be treated as the key to identify which level the element is actually reside.
+#          In that case, I guess YAML user should follow several rules as follow:
+#              1. Do not mix data type
+#              2. Put an eye on the indent, especially when the data cross multiple-lines
+#          Maybe certains plugins could help.
+
+# Syntax: Array, ordered-list
+#             [in rows]   - Value
+#             [in stream] [Value, Value, ...]
+- 1
+- Value
+# = [1, Value]
+
+# Syntax: Set, unordered-list
+#             [in rows]    ? Value
+#             [in stream]  {Value, Value, ...}
+? 1
+? Value
+# = {1, Value}
+
+# Syntax: Hash, unordered-map
+#             [in rows]   Key: Value
+#             [in stream] {Key1: Value1, Key2: Value2, ...}
+Key1: 1
+Key2: Value
+# = {Key1: 1, Key2: Value}
+
+# Syntax: Ordered-map
+#             [in rows]   - Key: Value
+#             [in stream] [Key1: Value1, Key2: Value2, ...]
+- Key1: 1
+- Key2: Value
+# = [Key1: 1, Key2: Value]
+
+# Syntax: Composite-Key, can be used in Hash and Ordered-map
+#             ?Key: Value
+#         I think here the Key should point to an "Object" to make use of certain function to get this composite-key
+
+# Syntax: Block
+#         Usually means a paragraph of text, and '"' is not necessarily required unless you have to use some sepcial characters. 
+#         Here will allow two styles to indicate whether the new-lines should be handled
+#                 | 
+#                 Preserve new-lines & leading white-spaces
+#                 >
+#                 Leading white-spaces will be removed, new-line will become space & aggregated to same paragraph. Blank-Line will be treated as a paragraph
+
+# Syntax: Repeated Node
+#                 &Key
+#                 Node-Anchor, I think this is a prefix to note the follow value could be repeated 
+#                 *Key
+#                 Node-Reference, another prefix to note the value was referenced from the Anchor
+- &Hash { x: 1, y: 2} 
+- &Hash2 { y: 3, z: 4}
+# can be used as [*Hash, *Hash2]
+
+# Syntag: Merge
+#                 <<
+#         this keyword usually used when Hash merge, examples were looks like this
+#                 << : Data 
+#                 Key1: Value1
+#                 Key2: Value2  # Might override merged value
+#         i simply hope it could have a more generalized definition so i could understand why i have to put a ':' before Data
+#
+
+# Syntax: Force-Type-Casting
+#                 !!TypeName Value
+#         YAML should have embeded Type like "float" or "str", you can see exapmles like
+#             !!float 3.1415
+#         When casting to string, you can also just put it into two '"'s
+# Syntax: User-Defined Type 
+#                 !TypeName
+#         the following is something i really want to do, 
+#         i think this could become a great example
+!RestaurantInfo
+    Name
+    Location #Array because of Branches
+    BusinessHour #Array
+    Category #Array, Category-Design is important for multi-demension search
+    RecommededDishes #Array
+    Features
+
+... #this used as the end of whole file, especially useful in streaming
+

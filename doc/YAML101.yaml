@@ -1,0 +1,84 @@
+# start document by "---", also used as seperator of documents
+---
+# basically, YAML is a superset of JSON, so elements inside has to be key-value-pairs
+# here the ": " is the primary feature of key-value-pairs
+string_key: no_casting_value
+# when keys have spaces, quoting is not necessary
+key with spaces: value
+
+# key in YAML can be complex types with "? " prefix
+? typeName anything: value
+# notice the format & indentation
+? |
+  This is a key
+  that has multiple lines
+: and this is its value
+# mapping between sequences with the complex key also allowed
+? - key1
+  - key2
+: ["value1", "value2"]
+
+# value can cast to specific-type by using "!!typeName " prefix
+# JavaScript has supporting types as follow
+#    String: quotes are not necessary, but you can choose single-quote or double-quote
+#    Boolean
+#    Number: including scientific_notation, like 1e+12
+#    Float
+#    Null
+#    Time: ISO8601 format, like 2001-12-14t2:59:43.10-05:00
+#    Date: ISO8601 format, like 1976-07-31
+key: !!typeName value_to_cast
+
+# value and it's type can be writen in multi-line with indentation(SPACEs only, TAB is not allowed), then forms the Nesting architecture
+key: !!typeName
+  value_in_second_line
+# when value is a paragraph, here are two special typeName can be used: literal block(|) or folded block(>)
+paragraph_1: |
+  Preserve new-lines
+  Preserve leading white-spaces
+paragraph_2: >
+  New-lines will become white-spaces,
+  Leading white-spaces will be removed
+
+# Anchor(&) & Alias(*) are useful when repeating content
+# when using Alias in a Dictionary, "<<:" is required
+shared: &share
+  common_1: value_1
+  common_2: value_2
+obj1: 
+  self_key: value
+  <<: *share
+obj2: 
+  self_key: value
+  <<: *share
+
+# YAML is designed for supporting STREAM-MODE, whole content can be serialized into single-line
+# the result of example below seems like an Object, it also indicates the sequence of keys not necessarily equals to the order they appear
+# so the output also known as Unordered-list, Unordered-map, or Dictionary
+example: |
+  "_key1: _value1"
+  "_key2: _value2"
+  "    serialized to "
+  "{_key1: _value1, _key2: _value2}"
+
+# sometimes you might just define a key without it's value, here are two possible options
+null_value_example: |
+  "key: ~" or
+  "? key"
+
+# in case the sequence of items matters, you can also hold it by using "- " before keys
+# notice the indentation
+a_sequence: 
+- "character - counts as indentation"
+- item1
+- item2
+- - this is a sequence inside another sequence
+# corresponding serialization output has slight difference between Unordered-list(more like an Array)
+# A.K.A Ordered-map
+example: |
+  "- first_key: value_1"
+  "- second_key: value_2"
+  "    serialized to "
+  "[first_key: value_1, second_key: value_2]
+# end whole stream by "..."
+...

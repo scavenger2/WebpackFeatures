@@ -1,0 +1,38 @@
+Match-Result: 
+    A partial text that matches a certain Expression.
+
+Initializer: 
+    Have to put on the beginning, inside of paird curly braces "{" and "}".
+Parser-Action: 
+    Also a piece of JavaScript code inside of curly braces. Used as a transformer of Match-Result.
+    Preceding Expression is mandatory.
+
+Structure of PEGJS file: |
+    [Initializer]
+    [Rule]
+    Each [Rule] can have following formats: 
+        Rule-Name = 
+            [Expression], you can define different Expression for different matching cases like below.
+                ["literal"] or ['literal'], for matching exact literal string.
+                [.], for matching one character.
+                [[characters]], for matching a character inside a range of characters.
+                [Rule-Name], use other Rule, usually it occurs when combining several Rules.
+            [(Expression)], Match a sub-expression and return its Match-Result.
+            [Expression *], Match zero or more repetitions of the Expression
+            [Expression +], Match one or more repetitions of the Expression
+            [Expression ?], Try to match the Expression, it returns Match-Result or Null
+            [$ Expression], Try to match the Expression, it returns matched-text instead of Match-Result when succeed.
+            [& Expression], Try to match the Expression, returns "undefined" and do not consume any input when success, otherwide consider the match failed.
+            [! Expression], Try to match the Expression, returns "undefined" and do not consume any input when not success, otherwide consider the match failed.
+            [{Predicate}], just like "& Expression" and "! Expression" above, here the Predicate is a piece of JavaScript code executed as if it was inside  a function. The function can access anything including Match-Result and thing defined in initializer, Location object. You can take Predicate as unlisted Expression used for further confirmation.
+            [Label:Expression], make a label for Match-Result which can be used in Action.
+            [Expression_1 Expression_2 ... Expression_N], Match a sequence of Expressions.
+            [Expression_1 / Expression_2 / ... / Expression_N], Match one of the Expressions then return the Match-Result.
+            [Expression {Action}], Run the Action when Expression is matched successfully. There are several special functions Action can invoke inside of function body.
+                text(), access the text matched by the Expression.
+                location(), get the location where the parsing occurs.
+                error(error_msg, location), to throw an exception with error_msg.
+                expected(description, location), 
+
+    ...
+    [Rule]
