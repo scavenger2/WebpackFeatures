@@ -25,7 +25,7 @@ gulp.task("auto-recompile-parser", function(){
                 output: "source"
             })
             .pipe(
-                gulp.dest(path_to_src);
+                gulp.dest(path_to_src)
             );
     });
 });
