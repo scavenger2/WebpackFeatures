@@ -1,6 +1,6 @@
 {
-    "name": "webpack_features_survy",
-    "version": "1.0.0",
+    "name": "YAMLParser",
+    "version": "0.0.1",
     "description": "try to build a chrome plugin",
     "private": true,
     "browserslist": [
