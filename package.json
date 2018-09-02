@@ -1,5 +1,5 @@
 {
-    "name": "chrome_plugin",
+    "name": "webpack_features_survy",
     "version": "1.0.0",
     "description": "try to build a chrome plugin",
     "private": true,
