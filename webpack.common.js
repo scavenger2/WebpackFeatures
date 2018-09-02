@@ -5,7 +5,7 @@ const ManifestPlugin = require("webpack-manifest-plugin");
 
 var config = {
 	target: "web",
-    entry: ["@babel/polyfill", "./src/app.js"],
+    entry: ["@babel/polyfill", "./src/index.js"],
 	output: {
 		chunkFilename: '[name].[chunkhash].js' //for dynamic-loading
 	},
