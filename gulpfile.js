@@ -12,6 +12,24 @@ const jsdoc=require("gulp-jsdoc3");
 gulp.task("jsdoc", function(callback){
 });
 
+// generate Parser by compiling PEG files
+var pegjs=require("gulp-pegjs");
+gulp.task("auto-recompile-parser", function(){
+    console.log("recompile parsers...");
+    var path_to_src="src";
+    var path_to_def=path_to_src+"/parserDef/*.pegjs";
+    gulp.watch(path_to_def, function(){
+        gulp.src(path_to_def)
+            .pipe({
+                format: "commonjs",
+                output: "source"
+            })
+            .pipe(
+                gulp.dest(path_to_src);
+            );
+    });
+});
+
 // start Webpack-Dev-Server
 const webpack=require("webpack");
 const webpackMerge=require("webpack-merge");

@@ -10,7 +10,7 @@
         "doc": "gulp jsdoc",
         "build-state": "webpack --json > stats.json",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "gulp webpack-dev-server",
+        "start": "gulp auto-recompile-parser webpack-dev-server",
         "build": "webpack --config webpack.prod.js"
     },
     "author": "",
@@ -29,6 +29,7 @@
         "file-loader": "^1.1.11",
         "gulp": "^4.0.0",
         "gulp-jsdoc3": "^2.0.0",
+        "gulp-pegjs": "^0.1.0",
         "gulp-util": "^3.0.8",
         "html-webpack-plugin": "^3.2.0",
         "mini-css-extract-plugin": "^0.4.1",
