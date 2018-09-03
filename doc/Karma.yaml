@@ -49,7 +49,7 @@ Configuration(karma.conf.js):
                 files: [], // seems like the sequence of patterns determine the sequence of served files?
                 exclude: [],
                 frameworks: [],
-                preprocessors: {},
+                preprocessors: {'**.*.coffee': 'coffee'},
                 plugins: ['karma-*'],
                 
                 // appearance-related-options
@@ -57,10 +57,10 @@ Configuration(karma.conf.js):
                 
                 // testing behaviors
                 client.args: undefined,
-                client.useIframe: true,
-                client.runInParent: false,
-                client.clearContext,
-                concurrency: Infinity,
+                client.useIframe: true,     // true=run the tests inside an iFrame, false=run the tests in a new window
+                client.runInParent: false,  // true=runs the tests inside the original window without using iframe
+                client.clearContext: true,  // true=clears the context window upon the completion of running the tests
+                concurrency: Infinity,      // how many browsers Karma launches in parallel
                 crossOriginAttribute: true,
                 failOnEmptyTestSuite: true,
                 processKillTimeout: 2000,
@@ -68,24 +68,24 @@ Configuration(karma.conf.js):
                 
                 // console-related-options
                 browserConsoleLogOptions: {level: "debug", format: "%b %T: %m", terminal: true}
-                client.captureConsole: true,
+                client.captureConsole: true, // capture all console output and pipe it to the terminal
                 
                 // watch-related-options
                 autoWatch: true,
                 autoWatchBatchDelay: 250  // Karma tries to batch multiple changes into a single run, this configuration tells Karma how long to wait from the last file change before starting the next run
                 
                 // karma server
-                detached: false,
-                forceJSONP: false,
+                detached: false, // start the Karma server in another process. can be stopped using "karma stop"
+                forceJSONP: false, // force socket.io to use JSONP polling instead of XHR polling
                 protocol: 'http:',
                 listenAddress: "0.0.0.0",
                 port: 9876,
                 urlRoot: "/",
                 hostname: "localhost",
-                mime: {},
+                mime: {}, // redefine default mapping from file extensions to MIME-type
                 httpsServerOptions: {},
-                logLevel: config.LOG_INFO,
-                loggers: [{type: 'console'}],
+                logLevel: config.LOG_INFO,    // level of logging
+                loggers: [{type: 'console'}], // a list of log appenders to be used
                 httpModule: undefined,
                 middleware: [],
                 beforeMiddleware: [],
@@ -104,7 +104,7 @@ Configuration(karma.conf.js):
                 browserDisconnectTolerance: 0,
                 browserNoActivityTimeout: 10000,
                 retryLimit: 2,
-                transports: ['polling', 'websocket'],
+                transports: ['polling', 'websocket'], // allowed transport methods between Karma server and browsers
                 
                 // report-related
                 reporters: ['progress'],
