@@ -1,0 +1,66 @@
+---
+References: 
+    ? https://zh.wikipedia.org/wiki/代碼覆蓋率
+    ? https://github.com/gotwarlost/istanbul
+    ? https://github.com/zordius/gulp-jsx-coverage
+    ? https://github.com/webpack-contrib/istanbul-instrumenter-loader/
+    ? https://istanbul.js.org/
+    ? https://bryce.fisher-fleig.org/blog/setting-up-istanbul-with-jasmine/
+    ? https://medium.com/@scbarrus/how-to-get-test-coverage-on-react-with-karma-babel-and-webpack-c9273d805063
+
+Overview: 
+    ? It is NOT a static code analysis tool, it instrument code running like spyOn().andCallThrough() in Jasmine
+    ? it generates files under folder "coverage" while instrumenting
+    ? Coverage should be applied to your application, not your tests
+    ? now you have instrumented code, then run your tests against the instrumented code
+    ? Unit-tests and Integration-tests can have istanbul check separately, but overall coverage check is also recommended
+
+Installation: 
+    - npm install --save istanbul jasmine-node
+    - adding NPM command for initializing test: |
+        command would look like "test: istanbul cover --include-all-sources jasmine-node test"
+        "--include-all-sources" flag causes istanbul to recurse through directories for source files to instrument
+        everything after "istanbul cover --include-all-sources" is the test command
+        "test" is the foler name contains your test cases
+        folders like "test", "tests" are ignored defauly by istanbul
+    - however, put Karma, babel, webpack, istanbul all together is what i want really
+    - install testing tools like "npm install karma jasmine karma-jasmine karma-webpack --save-dev"
+    - install karma-cli globally like "npm install karma-cli -g"
+    - install sourcemap-loader for issues brought up by karma like "npm install karma-sourcemap-loader --save-dev"
+    - install karma's versitile test coverage plugin like "npm install karma-coverage --save-dev"
+    - install istanbul-instrumenter-loader which fixes the issue that karma-coverage returns transpiled code "npm i -D istanbul-instrumenter-loader"
+
+Configuration: 
+    ? have to point out which files to instrument & how to run the tests
+    ? to help keep tests and source code distinct for Istanbul, separated top-level directories are recommended
+    ? pseudo karma.conf.js: |
+        {
+            files: ['test.webpack.js'],
+            plugins: ['karma-jasmine', 'karma-webpack', 'karma-sourcemap-loader', 'karma-coverage'],
+            preprocessors: {
+                'test.webpack.js': ['webpack', 'sourcemap']
+            },
+            reporters: ['coverage'],
+            webpack: {
+                module: {
+                    postLoaders: [{
+                        test: /\.js$/,
+                        exclude: /(test|node_modules)\//,
+                        loader: 'istanbul-instrumenter'
+                    }]
+                }
+            },
+            webpackServer: {
+                noInfo: true  // don't spam the console when running in karma
+            },
+            coverageReporter: {
+                type: 'html',  //produces a html document after code is run
+                dir: 'coverage/' //path to create html doc
+            }
+        }
+    ? pseudo test.webpack.js: |
+        this will find all of our tests and run them
+        var context = require.context('./src', true, /-test\.js$/);
+        context.keys().forEach(context);
+
+...

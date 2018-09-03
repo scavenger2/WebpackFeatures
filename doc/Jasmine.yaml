@@ -1,0 +1,87 @@
+# https://jasmine.github.io/2.5/introduction
+Jasmine: |
+    "Jasmine" is a Testing-Framework(like "Mocha" or "QUnit") which can be used to implement testing source code.
+    Whole architecture of testing source might looks like 
+        "SUITE"(using "describe") - subjects to the component you wanna test
+                            "beforeAll", Callback that execute once before all "Spec"
+                            "beforeEach", Callback that execute before each "Spec"
+            "Spec"(using "it") - subjects to the functionalities your testing-target meant to have
+            Note that "this" here in "beforeEach", "afterEach", "Spec" is shared and refered to same target.
+                "Expect"(could use other Assertion-Library here) - subjects to certain state should be in certain situation
+                            "afterEach", Callback that execute after each "Spec"
+                            "afterAll", Callback that execute once after all "Spec" finished
+    "SUITE"s are nestable.
+    "x" can be prepend to "describe" or "it" to omit that testing-target.
+
+    Functions are testable and should be tested when doing TDD. "Spy" is the machanism which in charge of this.
+    "Spy" implementing Proxy-Pattern to provide Mocking-Functions which could be easier to do monitoring and easier to do Environment-Initialization. Existing-Functions can be monitoring by "spyOn", and Non-Existing-Functions can be created & monitored by "createSpyObj".
+Chai: |
+    "Chai" is an Assertion-Library which could provide more intuitive statement to support testing.
+    Here would use "Expect" style and APIs are grouped by specific purposes.
+    Chaining: |
+        to
+        be
+        been
+        is
+        that
+        which
+        and
+        has
+        have
+        with
+        at
+        of
+        same
+    Flags: |
+        not
+        deep (testing "EQUALITY" and "PROPERTY")
+        any (testing "KEYS")
+        all (testing "KEYS")
+        itself (testing "RespondTo")
+    TestingTargets: |
+        VALUE: |
+            OK
+            true
+            false
+            null
+            undefined
+            NaN
+            equal
+            property
+            length
+            lengthOf
+            match
+            string
+        NUMBER: |
+            most
+            above
+            within
+            below
+            least
+            closeTo
+        TYPE: |
+            a/an
+            instanceof
+        CONTENT: |
+            include
+            exist
+            empty
+            ownProperty
+            ownPropertyDescriptor
+            keys
+            members
+            oneOf
+        ERROR: |
+            throw
+        FUNCTION: |
+            arguments
+            respondTo
+            satisfy
+            change
+            increase
+            decrease
+        ObjectExtensibility: |
+            extensible (can have new properties)
+            sealed (can not have new properties, existing properties can not remove)
+            frozen (can not have new properties, existing properties can not modify)
+            
