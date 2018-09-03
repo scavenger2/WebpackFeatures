@@ -1,10 +1,10 @@
 {
-    "name": "webpack_features_survy",
+    "name": "webpack_features_survey",
     "version": "1.0.0",
     "description": "try to build a chrome plugin",
     "private": true,
     "browserslist": [
-        "last 2 Chrome versions"
+        "last 2 versions"
     ],
     "scripts": {
         "doc": "gulp jsdoc",
