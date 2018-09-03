@@ -4,7 +4,7 @@ module.exports = function(config){
     config.set({
         basePath: "./test/unitTest",
         files: [
-            "./webpack.test.js",
+            //"./webpack.test.js",
             "./**/*.spec.js"
         ],
         exclude: [],
@@ -14,6 +14,10 @@ module.exports = function(config){
         },
 
         colors: true,
+
+        client: {
+            clearContext: false
+        },
 
         autoWatch: true,
 
