@@ -13,22 +13,12 @@ Overview:
     ? it generates files under folder "coverage" while instrumenting
     ? Coverage should be applied to your application, not your tests
     ? now you have instrumented code, then run your tests against the instrumented code
-    ? Unit-tests and Integration-tests can have istanbul check separately, but overall coverage check is also recommended
+    ? Unit-tests and Integration-tests can have coverage check separately, but overall coverage check is also recommended
 
 Installation: 
-    - npm install --save istanbul jasmine-node
-    - adding NPM command for initializing test: |
-        command would look like "test: istanbul cover --include-all-sources jasmine-node test"
-        "--include-all-sources" flag causes istanbul to recurse through directories for source files to instrument
-        everything after "istanbul cover --include-all-sources" is the test command
-        "test" is the foler name contains your test cases
-        folders like "test", "tests" are ignored defauly by istanbul
-    - however, put Karma, babel, webpack, istanbul all together is what i want really
-    - install testing tools like "npm install karma jasmine karma-jasmine karma-webpack --save-dev"
-    - install karma-cli globally like "npm install karma-cli -g"
-    - install sourcemap-loader for issues brought up by karma like "npm install karma-sourcemap-loader --save-dev"
     - install karma's versitile test coverage plugin like "npm install karma-coverage --save-dev"
     - install istanbul-instrumenter-loader which fixes the issue that karma-coverage returns transpiled code "npm i -D istanbul-instrumenter-loader"
+    - install reporter by "npm install karma-coverage-istanbul-reporter --save-dev"
 
 Configuration: 
     ? have to point out which files to instrument & how to run the tests
