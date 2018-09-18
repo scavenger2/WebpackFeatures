@@ -1,0 +1,42 @@
+---
+references: 
+    - https://storybook.js.org/basics/quick-start-guide/
+    - https://www.robinwieruch.de/react-testing-tutorial/
+    - https://www.robinwieruch.de/visual-regression-testing-react-storybook/
+
+overview: 
+    - it provides an environment(dev-server) to visualize different states of Components
+    - runs outside of developing projects
+    - storybook has its own Webpack setup, some features are supported defaultly
+    - it could also be used to showcase your Components to others
+    - testing UI Components between new code commits can make codebase more robust
+
+installation: 
+    - add any dependencies you need in your Webpack
+    - add storybook addon for React: npm install @storybook/react --save-dev
+    - add NPM script like "start-storybook -p 9001 -c .storybook"
+
+configuration: 
+    - Babel for ES6 transpiling is enabled defautly
+    - Some loaders of Webpack were added to bring some good defaults
+    - add a file like ".storybook/webpack.config.js" for manually config Webpack
+    - it needs a directory for configuring like ".storybook" mentioned above
+    - add a config file like ".storybook/config.js" which loads all stories: |
+        import {configure} from '@storybook/react';
+        function loadStories(){
+            require('../stories/index.js')
+        }
+        configure(loadStories, module);
+    - write your stories in correct directory
+
+how to write stories: 
+    - usually a story contains a single state of one of your components
+    - technically, a story is a function that returns a Component
+    - "require.context" could be used for loading-stories-dynamically
+    - there are different aspects of UI testing: 
+        - structural testing: make sure all contents are displayed, try snapshop testing
+        - interaction testing: simulate behaviors users might do to your Components
+        - Style testing: evaluate the look and feel of Components between code changes
+        - manual testing: do this is recommended especially after a major code change
+
+...
