@@ -39,4 +39,34 @@ how to write stories:
         - Style testing: evaluate the look and feel of Components between code changes
         - manual testing: do this is recommended especially after a major code change
 
+how to test Components with Enzyme: 
+    - use "shallow" for shallow-rendering, it is perfect for unit-test
+    - set different props for checking conditional-rendering
+    - lightweight integration tests are performed in two aspects: 
+        - by asserting whether the correct props are passed to children Components
+        - by asserting whether correct local state are manipulated
+    - "mount" renders the whole component hierarchy, might be used for more expensive integraton tests
+    - "render" is lightweight "mount" because it does not run the lifecycle methods of Components, especially suitable for those stateless Components
+    - testing pyramid on testing a Component: |
+        to have a few unit tests since they are unlikely to break because they isolate the Component too much from the rest of whole application
+        to have many integration tests to make sure they work as expected in their context(storybook.decorator might be helpful)
+        thus, you might use "mount" or "render" more often instead of "shallow"
+        do not forget interaction testing
+        testing asynchronous logic by implementing a fake-backend(Sinon might be helpful)
+    - visual regression testing can be used as automated tests to verify neither styles nor layouts breaks on different screen sizes, make sure all the Components rendered in the stories will be snapshoted then could be diffed with what's rendered
+    
+recommended addons: 
+    - Knobs: 
+        - purpose: used for keeping variables which are used in the stories as props flexible, these variables can be adjust in the rendered Storybook
+        - installation: npm install @storybook/addon-knobs --save-dev
+        - configuration: |
+            import {withKnobs} from '@storybook/addon-knobs'; //add these lines to config
+            ...
+            addDecorator(withKnobs);
+        - usage: |
+            import {text} from '@storybook/addon-knobs'; //add these lines to stories
+            ...
+            const children = text('label', 'My Checkbox Label');
+    - Viewport: 
+
 ...
