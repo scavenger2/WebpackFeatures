@@ -66,6 +66,9 @@ var config = {
         //    "*.css"
         //]
 	},
+    resolve: {
+        extensions: [".js", ".jsx"]
+    },
 	plugins: [
         new CleanWebpackPlugin(["dist"]),
         new ManifestPlugin() // for extracting an asset manifest file for easy consumption

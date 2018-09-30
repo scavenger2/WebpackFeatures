@@ -1,0 +1,279 @@
+---
+References: 
+    ? https://www.fooish.com/javascript/es6/
+    
+Block Scope: 
+    - VAR works at function scope
+    - Block scope resides in paired '{' and '}'
+    - hoisting may fail because Block-Scoped-Variables are hoisted into Temporal-Dead-Zone
+    - using LET for declaring a Block-Scoped-Variable, multiple declaration is not allowed
+    - using CONST for declaring a Block-Scoped-Constant, it can not be modified and should be assigned at the declaration
+
+Arrow Function: 
+    - format would looks like "(parameters) => {function body}"
+    - Parentheses of parameters may omitted when has only one parameter
+    - Curly-Brackets of function body may omitted when the function has only one line of expression
+    - "this" of function body is bound to the executing-context when declaring(not using, so the arrow-function usually used as anonymous function)
+
+Function Default Parameters: 
+    - just appending "= [defaultValue]" in function signature like "function fn(param1, param2 = 2)"
+
+Spread/Rest Operator(...): 
+    - used for spreading an array to Dot-separated-variables: |
+        var arr = [3, 4]; foo(1, 2, ...arr, 5)
+        var parts = ['shoulders', 'knees']; var lyrics=['head', ...parts, 'and', 'toes'];
+    - also used for accepting Variable-length argument: |
+        function fn(a, b, ...args){};
+        it can only placed in the last, and its value would be an Array
+
+Support new data structures: 
+    - Binary Literal: |
+        with  prefix "0b" or "0B"
+        var binaryValue=0b10; //2
+    - Octal Literal: |
+        with prefix "0o" or "0O"
+        var octalValue=0o10;  //8
+    - Symbol: 
+        - can be treat as a unique-id, Symbol can only be obtained by using Symbol()
+        - Symbol() is NOT a constructor, and it can receive a String parameter as its key: |
+            var s1=Symbol('boo'); 
+            s1.toString()=="Symbol(boo)"
+            Symbol.keyFor(s1)==="boo";
+        - Symbol can be used as a Property-Name of Object: |
+            assignment can only achieved by Computed-Property, '.' will convert Symbol into String
+                var mySymbol=Symbol(); var a={ [mySymbol]: value };
+            properties with type Symbol can only be traversed by Object.getOwnPropertySymbols()
+        - Symbol generates unique values, define it globally like fetched from a container: |
+            Symbol.for('foo');  //define a global symbol
+            Symbol.for('foo');  //return established Symbol
+            Symbol.for('foo')===Symbol.for('foo');  //identity
+            Symbol('bar')!==Symbol('bar');          //not equale even with same key
+    - Map/WeakMap: 
+        - keys of Object can be String/Symbol, but keys of Map can be anything
+        - data in Map is ordered, the sequence is determined by insertion order
+        - usage example: |
+            var myMap=new Map();
+            myMap.set({}, "it is an Object");
+            myMap.set(function(){}, "it is a Function");
+            // equals to initializing with Array
+            // var myMap=new Map([[{}, "it is an Object"], [function(){}, "it is a Function"]])
+            myMap.get({}) === undefined; // since the Object is not identity to original one
+        - WeakMap only accept Object as entries' key
+        - "Weak" refers to "Weak reference", it means several things: 
+            ? keys of entries will be garbage-collected in any time
+            ? once the key was removed, the entry will be removed
+            ? WeakMap does not support traversal-type operations like keys(), values(), entries(), forEach(), clear(), and size
+        - the best practice of WeakMap is storing DOM into WeakMap to avoid memory leak
+    - Set/WeakSet: 
+        - elements can be anything(like Array), but adding duplicate element is not allowed
+        - data in Set is ordered, the sequence is determined by insertion order
+        - usage example: |
+            var mySet=new Set();
+            mySet..add("value")add({}).add(function(){});
+            // equals to
+            // var mySet=new Set(["value", {}, function(){}]);
+        - WeakSet shares same concept "Weak Reference" with WeakMap, except that it accept Objects only as its elements
+
+Template Literal: 
+    - quoted by two back-tick(`), expression can be interpolated by "${expression}": |
+        var a=5, b=10, multiply=function(a, b){return a*b};
+        console.log(`a is ${a}, b is ${b}, a+b=${a+b}, a*b=${multiply(a, b)}
+        `);
+    - can be appended to a Function(parenthesis omitted), called Tagged Template: |
+        var person='mike', age=28;
+        var myTag=function(strs, expression1, expression2){return strs[0]+expression1+strs[1]+expression2};
+        myTag`that ${person} is ${age} years-old`   // that mike is 18 years-old
+
+
+Object Literal Extensions: 
+    - property value shorthand: |
+        defining property and its value simultaneously when the property-name and accessed variable are the same
+            var bar="bar";
+            var obj={bar}; // equals to {"bar": bar}
+    - Method definition shorthand: |
+        similar to above, function with a name(keyword 'function' omitted) defined inside Object will be transformed into "functionName: anonymous function"
+            var obj={doSomething(){...}};  // equals to {doSomething: function(){...}}
+    - Computed property keys: |
+        property name can be a result of expression, just put the expression into a pair of square-bracket
+            var prefix="es6"; var obj={[prefix+" is"]: "value"}; // equals to {"es6 is": "value"}
+        it can also used as function name
+            var obj2={[prefix+" fn"](){...}}; // equals to {"es6 fn": function(){}}
+
+Destructuring Assignment: 
+    - in Array: |
+        can be used for assigning multiple variables in single line
+            var foo = ['one', 'two', 'three']; var [variable1, variable2, variable3]=foo; // variable1='one', variable2='two', variable3='three';
+        default-value and skipped-value can be used
+            var [a, , b="default"]=foo; // a='one', b='three', only two variables are defined
+        with Rest Operator is also allowed
+            var [a, ...b]=foo; // a='one', b=['two', 'three'];
+    - in Object: |
+        can be used for extracting property from an Ojbect, default value and specifying property name is possible
+            var o={p: 3, q: true, r=10}; var {p, q:s, r=10}=o; // p=3, s=true, r=10;
+        extracting from nested structure is possible
+            var obj={p: ['hello', {y: 'world'}]}; var {p: [x, {y}]}=obj; // x='hello', y='world';
+        can be used as function arguments
+            function fn({size='big', cords={x:0, y:0}, radius=25} = {}){console.log(size, cords, radius)};
+            fn({cords: {x: 18, y:30}, radius: 15})  //size='big', cords={x:18, y:30}, radius=15
+
+Enhanced OO syntax: 
+    keyword 'class': |
+        class Animal {          // arguments omitted
+            constructor(name){  // defined initial arguments here
+                this.name=name;
+            }
+            speak(){            // Method definition shorthand
+            }
+        }
+    keyword 'extends': |
+        class Dog extends Animal {
+            speak(){            // overwrite
+            }
+        }
+    keyword 'super': |
+        class Cat extends Animal {
+            constructor(mood){
+                super();        // mandatory once sub-class defines its constructor
+            }
+            speak(){            // only methods defines via shorthand could use 'super'
+                super.speak();  // if Animal.speak uses 'this', then 'this' here will refer to Cat
+                console.log("meow");
+            }
+        }
+    keyword 'static': |
+        class TestClass {
+            static staticMethod(){
+            }
+        }
+        TestClass.staticMethod();
+
+Iterators:
+    - it is the protocol defines how the object be iterated in customized order
+    - already implemented by String, Array, Map, and Set
+    - requisites: 
+        - Object has computed-property "[Symbol.iterator]: () => {return ITERATOR}"
+        - ITERAOTR is an Object providing next() method for querying iterating-progress
+        - iterating-progress has the format of "{done:boolean, value:any}"
+    - pseudo code: |
+        var foo = {
+            [Symbol.iterator]: () => {
+                return {
+                    items: ['p', 'o', 'n', 'y'],
+                    next: function(){
+                        done: this.items.length==0,
+                        value: this.items.shift()
+                    }
+                }
+            }
+        }
+        for(let charactor of foo){...}
+    - recommended way for iterating - "for...of": 
+        - comparisons: 
+            ? "for" is lousy
+            ? "forEach" make thins neat, but unable to use break/return
+            ? "for...in" uses index for further accessing instead of using value directly
+        - pseudo code: |
+            let iterable = "iterable";
+            for(let c of iterable){
+                console.log(c);
+            }
+
+Generators: 
+    - like a special implementation of Iterator
+    - a Generator runs like a state-machine, it can cooperate with outside and exchange information
+    - syntax: |
+        function* gen(){    // define a Generator by "function*"
+            var index = 0;
+            while(index<3){
+                // "yield" is a keyword, it will postpone execution of generator and sending value out
+                // "yield" has low precedence, it need to be wrapped for immediat execution in most cases
+                var value = yield index++;  
+                console.log(value);
+            }
+            // "return" will cause "done: true"
+            // but its return value will not be fetched by next() or for...of
+            // the only way to obtain the result value is "yield*"
+            return 10;
+        }
+        var g = gen();
+        // the first next() will start Generator until receiving current state from "yield"
+        // received state look like "{value: 0, done: false}" since Generator derived from Iterator
+        g.next(10);
+        // the following will result in
+        // Generator prints "20"
+        // outside prints "1"
+        g.next(20).value;
+        // return immediatly and cause done==true
+        g.return(NaN)
+        g.next(30).value;
+    - nesting Generators: |
+        here is another keyword "yield*" for nesting Generators,
+        it will embed another state-machine into its original state
+            function* g4(){
+                yield* [1, 2, 3];
+                return "foo";
+            }
+            var result;
+            function* g5(){
+                result = yield* g4();
+            }
+            var iterator = g5();
+            iterator.next();
+            iterator.next();
+            iterator.next();
+            iterator.next();
+            console.warn(result); // print "foo"
+
+Promise: 
+    - it is an Object waiting for completion of asynchronous operations
+    - its state start from "pending", then move to either "fulfilled" or "rejected"
+    - when state changes, it will not change again. so Promise objects are not reuseable
+    - syntax: |
+        var promise = new Promise(        // using constructor
+            function(resolve, reject){    // executed immediately, so Promise will not block
+                // do asynchronous things
+                // execute resolve(value) when asynchrouns operation success( pending -> fulfilled )
+                // if fail or error occurs in this function, reject(error) will execute( pending -> rejected )
+            }
+        ).then( // set callbacks when state changes
+            function(value){       // value was passed by resolve()
+                // things to do when "fulfilled"
+            },
+            (optional)function(error){    // error was passed by reject()
+                // things to do when "rejected"
+            }
+        ).catch(  // same as ".then(undefined, callback)"
+        )
+        .then(
+            // then() and catch() will return another Promise which enables Promise-chaining
+            // what if the return value is not a Promise?
+            // Promise.resolve(value) will transfer an Object into Promise then resolve it immediately
+            // similar to Promise.resolve(), Promise.reject(reason) will cause reject() executes
+            function(resolvedValue){
+                // resolvedValue it the return value of previous Promise.then()
+            }, 
+            undefined
+        )
+    - two tools will help when you have more than one Promise: 
+        - Promise.all(iterable_Promises): |
+            var p1 = Promise.resolve(3);
+            var p2 = 1337;
+            var p3 = new Promise(function(resolve, reject){setTimeout(resolve, 100, 'foo')});
+            Promise.all([p1, p2, p3])
+            .then(function(values){
+                // when ALL Promise Objects were fulfilled, their return values wil be assembled into an Array
+                console.warn(values);
+            }, function(firstFail){
+                // execute when any Promise become rejected
+            })
+        - Promise.race(iterable_Promises): |
+            var p1 = new Promise(function(resolve, reject){setTimeout(resolve, 500, 'one')});
+            var p2 = new Promise(function(resolve, reject){setTimeout(resolve, 100, 'two')});
+            Promise.race([p1, p2])
+            .then(function(value){
+                // when any Promise changes its state (become resolved/rejected)
+                // its result will become the value
+                console.warn(value);
+            })
+
+...

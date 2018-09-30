@@ -1,0 +1,28 @@
+---
+References: 
+    ? https://www.robinwieruch.de/react-testing-tutorial/#react-component-test-coverage-coveralls
+
+Testing context: 
+    Unit test: to test a piece in isolation
+    Integration test: make sure that a piece works in its context with other pieces
+    End-to-end test: testing application in a browser environment
+
+Testing aspects: 
+    ? asynchrouns operations
+    ? passed props
+    ? rendered elements
+    ? simulated clicks
+    ? state changes
+
+Overview: 
+    ? try "enzyme" which is designed for React
+    ? choose your favorited combination of Test-Runner, Test-Framework, Assertion-Library, and Coverage-Check
+    ? Unit-tests are achieved by "shallow()"
+    ? Integration-tests are achieved by "mount()" or "render()" depends on whether Component-Lifecycle matters
+    ? End-to-end-tests can be achieved by "TestCafe"
+
+Testing philosophies: 
+    ? lots of unit tests and several integration tests, with a few end-to-end tests(common approach in software engineering)
+    ? many integration tests but only a few unit tests(more focused on the robustness, seems more suitable to Components)
+
+...

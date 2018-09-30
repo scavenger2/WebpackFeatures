@@ -1,0 +1,78 @@
+---
+references: 
+  https://medium.com/welldone-software/an-overview-of-javascript-testing-in-2018-f68950900bc3
+traditional difficulties: 
+  ? limited
+  ? hard to implement
+  ? slow
+  ? expensive
+most important test types: 
+  Unit test: 
+    overview: |
+      testing of individual functions or classes, should cover all pure units like utils, services, and helpers.
+      Simple case & edge case of input should provided and make sure their outputs are as expected.
+      to make sure every small parts working.
+    topics: 
+      testing structure & syntax (A.K.A testing framework): 
+        - purpose: refers to the organization of your tests, like BDD(Behavior-Driven-Development) structure
+        - tools: Mocha, Jasmine, Jest, Cucumber
+      assertion: 
+        - purpose: provide functions that making sure tested variables contain the expected value
+        - tools: Chai, Jasmine, Jest, Unexpected
+      coverage: Istanbul, Jest, Blanket
+      generate & watch test results: Mocha, Jasmine, Jest, Karma
+  Integration test: 
+    overview: |
+      testing processes or components to behave as expected, including the side effects.
+      should cover important cross-module processes
+      every small parts work expectedly sometimes doesn't guarantee the whole application work correctly,
+      especially thoese unexpected failures where you fix one thing and break the other.
+    topics: 
+      generate & compare snapshots of component & data structures: 
+        - purpose: usually made to compare component representation data, but other types of data like redux stores also effective
+        - tools: Jest, Ava
+      mocks, spies, and stubs: 
+        - purpose: |
+          mocks(fakes) faking certain modules or behaviors to test different parts of a processes
+          spies provide us with information about functions, like how many times were called
+          stubs(dubs)replaces selected functions with selected functions to ensure an expected behavior. like making isValid() always return true
+        - tools: Sinon(for faking a server), Jasmine, enzyme, Jest, testdouble
+      physical browsers or provide browser-like environment: jsdom, Protractor, Nightwatch, Phantom, Gasper
+  UI test(A.K.A Functional test, end-to-end test): 
+    overview: |
+      testing scenarios on the product itself.
+      always running inside a physical browser or browser-like environment.
+      the hardest to set up, this is why there are many services that provide this service for you.
+      however it's worth investing time in understanding the differencies between UI testing tools
+    browser automation: 
+      - |
+      it is straightforward enought for UI test, Selenium plays the major role nevertheless it was not meant for testing.
+      WebDriver is required as a communication layer between our testing framework and Selenium Server.
+      here diverges to two approaches,
+      some people claim that WebDriver itself is sufficient, then various libraries were created by extending it, 
+      libraries wrapping the WebDriver might add redundant code and could make debugging harder, whereas ones forking it were under very active ongoing development.
+      the other peope focus on operating Selenium
+        - Appium: testing websites on a mobile device
+        - Protractor: wraps Selenium to add it an improved syntax and special in-built hooks 
+        - WebdriverIO: has its own implementation of the Selenium WebDriver, great syntax & very flexible
+        - Nightwatch: has its own implementation of the Selenium WebDriver, and its own testing framework, assertions, and tools
+        - TestCafe: a great alternative to Selenium-Based tools, it injects itself into the website as JavaScript scripts instead of controlling the browsers.
+        - Cypress: a direct competitor of TestCafe, newer but less mature
+        - Puppeteer: developed by Google, it provides a Node.js API to control Headless Chrome
+        - PhantomJS: implements the chromium engine to create a controllable Chrome-like headless browser, might vanish since Google announced their Puppeteer
+        - Casper: written on top of PhantomJS & SlimerJS(like PhantomJS but using Firefox's Gecko) to provide simplified navigation, scripting, and testing.
+      - modern headless browsers: 
+        - Headless Chrome: uses the latest Chrome engine, unlike PhantomJS that is built on an older fork of WebKit
+        - Headless Firefox: 
+        - both two above can be used by TestCafe & Karma for UI-testing & Unit-testing respectively
+    conclusion so far: 
+      TestCafe: reliable, simple to set-up, cross-browser
+      WebdriverIO: maximum community support
+suggestion about how to perform these tests: |
+  creating two processes, one for Unit test & Integration test, another for UI test.
+  because UI test is more expensive (both in time & money), usually only before a merge of a feature branch
+recommended combination: 
+  ? Jest seems great for starting
+  ? Mocha + Chai + other libraries seems great for learning
+  
+...

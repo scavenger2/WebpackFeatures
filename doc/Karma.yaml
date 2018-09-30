@@ -1,0 +1,170 @@
+---
+References: 
+    ? https://karma-runner.github.io/2.0/index.html
+    ? https://www.codementor.io/kimagure/testing-reactjs-components-with-karma-and-webpack-8sdzi6hkf
+    ? https://medium.com/@grrowl/testing-react-with-jasmine-and-karma-using-webpack-and-babel-18fc268f066a
+    ? https://kentor.me/posts/testing-react-and-flux-applications-with-karma-and-webpack/
+    ? https://medium.com/codeclan/testing-react-with-jest-and-enzyme-20505fec4675
+    ? https://medium.com/@ntgard/jest-snapshot-testing-the-bad-parts-c93aca187ba5
+
+Overview: 
+    ? it is a tool which spawns a web server that executes source code against test code(run inside an IFrame) for each of the browsers connected
+    ? tests will be re-run whichever files specified within the configuration changes
+    ? a browser can be captured either manually(visit the URL) or automatically(trigger browsers by Karma)
+
+Installation: 
+    - install Karma & other testing tools locally like "npm install karma karma-jasmine jasmine-core --save-dev"
+    - install Karma-cli globally for better accessability like "npm install karma-cli -g"
+
+Configuration(karma.conf.js): 
+    - try "karma init" for generating configuration file, edit it manually is also work
+    - almost all configuration options could be specified by assigning command-line-arguments
+    - some configuration options could use "minimatch" to facilitate file expressions like "exclude", "files", and "preprocessors"
+    - notes when defining "files": 
+        - determines which files are included in the browser and which files are watched and served by Karma
+        - it is an Array, contains simple string(minimatch expression) or configuration-object, both types are considered as "Pattern"
+        - configuration-object would looks like: |
+            {
+                pattern: String,    //Mandatory, use for matching files
+                type: String,       //choose the type to use when including a file, determined by checking file-extension
+                watched: Boolean,   //when autoWatch==true, then files with watched==true will be watched for changes
+                included: Boolean,  //should the file be included using <script>
+                served:  Boolean,   //should matched files be served by Karma server
+                nocache: Boolean    //should matched files be served from disk on each request
+            }
+        - the order of patterns determines the order in which files are included in the browser
+        - multiple files matching a single pattern are sorted alphabetically
+        - each file is included exactly once, if multiple patterns match the same file, then the file is included once matched the first pattern
+    - notes when defining "preprocessors":
+        - specified files in the "files" are filtered by "preprocessors" configuration
+        - to do some work with matched files before they get served to the browser, their native format is no longer available
+        - most used preprocessors need to be installed as dev-dependency then loaded as plugins
+        - referenced preprocessors, like all plugins, can be configured directly inside Karma-Configuration-Object
+        - if a file matches multiple keys in the "preprocessors", Karma will try its best to perform the correct sequence
+    - overall example looks like below: |
+        module.exports = function(config){  //config refers to a configuration-object
+            config.set({
+                // test-runner functionalities
+                basePath: '', // the root path that will be used to resolve all relative paths defined in "files" and "exclude"
+                files: [], // seems like the sequence of patterns determine the sequence of served files?
+                exclude: [],
+                frameworks: [],
+                preprocessors: {'**.*.coffee': 'coffee'},
+                plugins: ['karma-*'],
+                
+                // appearance-related-options
+                colors: true
+                
+                // testing behaviors
+                client.args: undefined,
+                client.useIframe: true,     // true=run the tests inside an iFrame, false=run the tests in a new window
+                client.runInParent: false,  // true=runs the tests inside the original window without using iframe
+                client.clearContext: true,  // true=clears the context window upon the completion of running the tests
+                concurrency: Infinity,      // how many browsers Karma launches in parallel
+                crossOriginAttribute: true,
+                failOnEmptyTestSuite: true,
+                processKillTimeout: 2000,
+                restartOnFileChange: false,
+                
+                // console-related-options
+                browserConsoleLogOptions: {level: "debug", format: "%b %T: %m", terminal: true}
+                client.captureConsole: true, // capture all console output and pipe it to the terminal
+                
+                // watch-related-options
+                autoWatch: true,
+                autoWatchBatchDelay: 250  // Karma tries to batch multiple changes into a single run, this configuration tells Karma how long to wait from the last file change before starting the next run
+                
+                // karma server
+                detached: false, // start the Karma server in another process. can be stopped using "karma stop"
+                forceJSONP: false, // force socket.io to use JSONP polling instead of XHR polling
+                protocol: 'http:',
+                listenAddress: "0.0.0.0",
+                port: 9876,
+                urlRoot: "/",
+                hostname: "localhost",
+                mime: {}, // redefine default mapping from file extensions to MIME-type
+                httpsServerOptions: {},
+                logLevel: config.LOG_INFO,    // level of logging
+                loggers: [{type: 'console'}], // a list of log appenders to be used
+                httpModule: undefined,
+                middleware: [],
+                beforeMiddleware: [],
+                proxies: {},
+                proxyValidateSSL: true,
+                proxyReq: undefined,
+                proxyRes: undefined,
+                upstreamProxy: undefined,
+                reportSlowerThan: 0,
+                singleRun: false,
+                
+                // service availability
+                browsers: [],
+                captureTimeout: 60000,
+                browserDisconnectTimeout: 2000,
+                browserDisconnectTolerance: 0,
+                browserNoActivityTimeout: 10000,
+                retryLimit: 2,
+                transports: ['polling', 'websocket'], // allowed transport methods between Karma server and browsers
+                
+                // report-related
+                reporters: ['progress'],
+                formatError: undefined
+                
+                // exclusive for Firefox
+                jsVersion: 0
+            });
+        }
+
+Where to implement test-assets: 
+    alongside your components and modules in a top-level, separated folder like "__tests__"
+
+Enable usage of Webpack: 
+    - npm install karma-webpack --save-dev
+    - configure webpack inside of "karma.conf.js", or use existing webpack-configuration
+    - do not spam the console when running in karma: |
+        webpackMiddleware(or webpackServer): {
+            noInfo: true
+        }
+    - "files" should be the test-assets with adjusted context like below: |
+        require('babel-core/polyfill');  //enable ES6 syntax for all test-assets
+        var context = require.context('./src', true, /-test\.js$/);
+        context.keys().forEach(context);
+    - make files use proper preprocessors like " 'test.webpack.js': ['webpack', 'sourcemap'] "
+
+Enable usage of Sourcemap: 
+    - npm install karma-sourcemap-loader --save-dev
+
+Enable Snapshot-testing: 
+    - try "enzyme" for Unit-Test, Integration-Test, Assertion-Library, and Snapshot-Test to React-Applications
+    - npm install enzyme enzyme-adapter-react-16 --save-dev
+    - component rendering: 
+        - shallow: 
+            ? renders only component itself without any children
+            ? useful to isolate the component for pure unit testing
+            ? can only access the props passed into child components
+        - render: 
+            ? renders to static HTML, including children
+            ? does not have access to React lifecycle methods
+        - mount: 
+            ? Full DOM rendering, including child components
+            ? unmount() needed after each tests
+            ? allows access to both props directly passed into the root component and props passed into child components
+    - snapshot comparing: |
+        const strings = ['one', 'two'];
+        const component = shallow(<MyComponent list={strings} />);
+        expect(component).toMatchSnapshot();
+    - simulate events: |
+        .simulate('keydown', { keyCode: 32 })
+    - function spy: |
+        expect(clickFn).toHaveBeenCalled()
+
+How to test with something need refresh instance everytime: |
+    var projectContext = require.context('./src/js', true, /#^()*.jsx? #$/);
+    var projectModuleIds = projectContext.keys().map(module => String(projectContext.resolve(module)));
+    beforeEach(() => {
+        projectModuleIds.forEach(id => delete require.cache[id]);
+    });
+
+Performance tips: 
+    ? static files should be cached
+...

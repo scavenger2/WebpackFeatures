@@ -1,0 +1,74 @@
+---
+Overview: 
+    - support the latest syntax
+    - tests are executed on the server side
+
+Installation: 
+    - install TestCafe locally by "npm install testcafe --save-dev"
+    - add NPM script like "test: testcafe chrome tests/"
+    - try testcafe-live by "npm install testcafe-live --save-dev" which reflects the changes you make in the code immediately and then restart the tests, you will see the results instantly. just replace "testcafe" with "testcafe-live" in NPM script
+
+Special use-cases when running tests: 
+    - Browsers on Remote Devices: 
+        - to run tests remotely, the remote device must have network access to TestCafe server
+        - to create a remote browser connection: 
+            - command line: specify 'remote' alias like "testcafe remote tests/"
+            - API: use 'createBrowserConnection'
+    - Using Chrome device emulation: 
+        - using Chromes's built-in device emulator by setting "emulation" and "device"
+        - example: |
+            testcafe "chrome:emulation:device=iphone 6" tests/sample-fixture.js
+            testcafe "chrome:emulation:width=100;height=200;mobile=true;orientation=vertical;touch=true" tests/sample-fixture.js
+            or programmatically
+            runner.src("tests/sample-fixture.js")
+                    .browsers("chrome:emulation:device=iphone 6")
+                    .run();
+    - Concurrent Test Execution: 
+        - invoke multiple instances of the same browser, these instances constitute the pool of browsers, each test runs in the first free instance
+        - Microsoft Edge is not supported
+        - to enable the concurrency: 
+            - in command line: using "-c" or "-concurrency", like "testcafe -c 3 chrome tests/"
+            - in API: using "runner.concurrency", like "concurrency(3)"
+            - multiple browsers can be specified like "testcafe -c 4 safari,firefox tests/", in this case, you will got 4 safari instances for one suite of tests, and 4 firefox instnaces for another.
+        - Concurrency can be applied with remove-devices, just append the number of concurrent instances after alias "remote" like "testcafe remote:4 tests/".
+
+How to test: 
+    - Targeting the element: 
+        - 'Selector' used to get direct access to DOM elements and 'ClientFunction' used to obtain arbitrary data from the client side. You call these functions as regular async functions, thus you can obtain their result and use parameters to pass data to them.
+    - Performing Actions on the page: 
+        - obtain the element you wanna interact with
+        - 'Actions' like click or hover can be applied & chained
+        - these 'Actions' are implemented as async functions of the test-controller object, use await syntax when calling these functions
+    - Observing Page-State: 
+        - obtain elements by 'Selector', the API provides methods and properties to get their state
+    - Assertion: 
+        - TestCafe provides build-in assertions
+    - Reporter: 
+        - output test results in a certain format
+
+Architecture of testing: 
+    - Fixtures: |
+        tests must be organized into categories, which is named "Fixture" in TestCafe
+        "Fixture" allows you to configure the start webpage(by using ".page()"), metadata(can be used in report), initialization(by using fixture-hook ".before()"), and clean-up(by using fixture-hook ".after()")
+        fixture hooks are executed before the first test in fixture is started and after the last is finished, also ehy do not have access to the tested pag, so use them to perform server-side operations like preparing the server that hosts the tested app.
+        fixture hooks take Fixture-context "ctx" as parmater, you can use it to share values between test code. In test code, try accessing ctx via Test-controller like "t.fixtureCtx"
+        fixture also have test-hooks like "beforeEach" and "afterEach", but they might be overrided by each test's test-hooks(including "before" & "after")
+    - Test Controller: |
+        this object exposes the test API, that's why it is passed to each function that is expected to contain server-side test code
+        it also provides access to the internal context the test API requires to operate. that's why 'selectors' and 'client functions' need test-controller when they are called
+        Setting page-load-timeout by "t.setPageLoadTiimeout(duration)", the timeout means the duration after "DOMContentLoaded"(raised after the HTML document is loaded and parsed) and before "window.load"(raised after all stylesheets, images, and subframes are loaded)
+        Specifying hooks for individual test using ".before()" or ".after()", or you can share variables between test hooks by using test-context-object, like "t.ctx"
+    - Page Model: |
+        Page-Model is a pattern that allows you to create an abstraction of the tested page and use it in test code to refer to specific page elements.
+        In a rapidly developing web application, mock-up and design may change often, you might need to modify selectors in all your tests when this happens. Page-Model allows you to keep all selectors in one place, so the next time webpage changes, you will only need to modify the page-model.
+
+Simple Example: |
+    import { Selector } from 'testcafe';
+    fixture `Getting Started`
+        .page `http://devexpress.github.io/testcafe/example` // the page you wanna test
+
+    test('First test', async t=> { // here the t is test-controller-object
+        // test code
+        // includeing interact with page content, obtaining page state, etc
+    })
+...
