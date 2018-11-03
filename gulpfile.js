@@ -20,10 +20,10 @@ gulp.task("auto-recompile-parser", function(){
     var path_to_def=path_to_src+"/parserDef/*.pegjs";
     gulp.watch(path_to_def, function(){
         gulp.src(path_to_def)
-            .pipe({
+            .pipe(pegjs({
                 format: "commonjs",
                 output: "source"
-            })
+            }))
             .pipe(
                 gulp.dest(path_to_src)
             );
