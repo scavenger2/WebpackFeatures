@@ -15,7 +15,7 @@ var config = {
 				test: /\.(js|jsx|ts|tsx)$/,
                 exclude: [path.resolve(__dirname, 'node_modules')],
                 // use: ['babel-loader'],
-                use: {
+                use: [{
                     loader: "babel-loader",
                     options: {
                         "presets": [
@@ -39,7 +39,7 @@ var config = {
                             ]
                         ]
                     }
-                }
+                }, "eslint-loader"]
 		    },
             {
                 test: /\.(png|svg|jpg|gif)$/,
